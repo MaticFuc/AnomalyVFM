@@ -17,7 +17,7 @@
 </div>
 
 ## 🛎️Updates
-* **` Apr. 10th, 2026`**: The models and training code for AnomalyVFM have been organized and uploaded.
+* **` Apr. 9th, 2026`**: The models and training code for AnomalyVFM have been organized and uploaded.
 * **` Feb. 20th, 2026`**: AnomalyVFM has been accepted to CVPR 2026 🔥🔥🔥
 
 ## 🚧TODO
@@ -132,7 +132,7 @@ python train.py --no-eval
 - `--peft-rank`: Choose the rank for LoRA or DoRA.
 
 - `--data-path`: Provide the path to the training set. It should follow the same setup as our generated one.
-- `--image-size`: Choose the image size for training. Tested only 768 for RADIO and 672 for DINOv2. 
+- `--image-size`: Choose the image size for training. RADIO, DINOv3, SigLIP2 use 768 and DINOv2 and CLIP use 672. This is done to get the same feature size. 
 - `--out-path`: Choose the path to store the models and the results.
 
 - `--seed`: Choose the seed for training.
@@ -143,7 +143,7 @@ python train.py --no-eval
 - `--weight-decay`: Choose the weight decay for the optimizer (it should be 0 for `muon`).
 - `--scheduler`: Choose the scheduler for training (possible choices: `none`, `cos`, `multisteplr`, `exp`). By default `none`.
 
-- `--train-steps`: Amount of iteration steps for training. By default 500.
+- `--train-steps`: Amount of iteration steps for training. By default 200.
 - `--test-steps`: How often is the model tested. Only the final model is saved. By default 100.
 
 - `--no-evaluate`: Whether to have evaluation during and after training.
