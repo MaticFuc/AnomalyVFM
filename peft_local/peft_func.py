@@ -5,7 +5,9 @@ from peft_local.peft_wrapper import PeftTarget, PeftType, create_peft_wrapper
 
 def _add_attn_peft(model, r=4, alpha=1.0, peft_type=PeftType.LORA):
     for name, module in model.named_children():
-        if name == "qkv":
+        if name == "patch_embed":
+            pass
+        elif name == "qkv":
             wrapped = create_peft_wrapper(
                 layer=module,
                 target=PeftTarget.QKV,

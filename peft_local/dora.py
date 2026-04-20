@@ -15,9 +15,8 @@ class _DoRALinearBase(nn.Module):
 class DoRAWrapper(_DoRALinearBase):
     def __init__(self, layer: nn.Module, r: int = 4, alpha: float = 1.0):
         super().__init__(layer=layer, r=r, alpha=alpha)
-        out_dim, in_dim = self.layer.weight.shape
-        self.weight = self.layer.weight
-        self.bias = self.layer.bias
+        out_dim = self.layer.weight.shape[0]
+        in_dim = self.layer.weight.shape[1]
 
         if r > 0:
             self.lora_A = nn.Parameter(torch.randn(r, in_dim) * 0.01)
@@ -29,6 +28,14 @@ class DoRAWrapper(_DoRALinearBase):
             self.register_parameter("lora_A", None)
             self.register_parameter("lora_B", None)
             self.register_parameter("magnitude", None)
+
+    @property
+    def weight(self):
+        return self.layer.weight
+
+    @property
+    def bias(self):
+        return self.layer.bias
 
     def forward(self, x):
         if self.r <= 0:

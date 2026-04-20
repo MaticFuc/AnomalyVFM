@@ -10,12 +10,17 @@ class PeftType(str, Enum):
     DORA = "dora"
     VPT = "vpt"
 
+    def __str__(self):
+        return self.value
 
 class PeftTarget(str, Enum):
     QKV = "qkv"
     PROJ = "proj"
     LIN = "lin"
     BLOCK = "block"
+
+    def __str__(self):
+        return self.value
 
 
 _WRAPPER_REGISTRY = {
