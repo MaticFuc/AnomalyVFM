@@ -151,6 +151,8 @@ def main(args):
 
     if args.model in [BACKBONES.RADIO]:  # RADIO has 3 CLS tokens
         predictor = SimplePredictor(feat_dim * 3)
+    elif args.model in [BACKBONES.TIPSV2]: # TIPSv2 has 2 CLS tokens
+        predictor = SimplePredictor(feat_dim * 2)
     else:
         predictor = SimplePredictor(feat_dim)
 
