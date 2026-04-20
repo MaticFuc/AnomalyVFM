@@ -22,6 +22,7 @@ from peft_local.peft_func import PeftType
 warnings.filterwarnings("ignore", message="invalid value encountered in divide")
 
 from enum import Enum
+import json
 
 from models.model import BACKBONES, FeatureExtractor
 
@@ -129,6 +130,24 @@ def save_predictions_with_paths(tensors, original_paths, out_base_path, suffix="
 
         cv2.imwrite(str(out_file), img_np)
 
+def save_img_level_predictions(tensors, original_paths, out_base_path, suffix="pred"):
+    base_out = Path(out_base_path)
+
+    for tensor, path_str in zip(tensors, original_paths):
+        p = Path(path_str)
+
+        out_file = base_out / p.relative_to(p.anchor)
+        
+        new_stem = f"{out_file.stem}_{suffix}" if suffix else out_file.stem
+        out_file = out_file.with_name(f"{new_stem}.json")
+        
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+
+        score = float(tensor.item())
+
+        with open(out_file, "w") as f:
+            json.dump({"score": score}, f, indent=4)
+
 
 def test_category(
     model,
@@ -190,7 +209,7 @@ def test_category(
             pred_scores[idx] = score
 
             mask = torch.nn.functional.interpolate(mask, (mask_size, mask_size))
-            mask = mask.squeeze()
+            mask = mask.squeeze(1)
             if kernel is not None:
                 mask = k(mask)
 
@@ -198,13 +217,13 @@ def test_category(
                 save_predictions_with_paths(image, paths, out_path, suffix="img")
                 save_predictions_with_paths(mask, paths, out_path, suffix="pred")
                 save_predictions_with_paths(mask_gt, paths, out_path, suffix="gt")
+                save_img_level_predictions(score, paths, out_path, suffix="pred")
 
             gts[idx, :, :] = mask_gt
             preds[idx, :, :] = mask
 
             ptr += batch_sz
             pbar.update(batch_sz)
-
     score_min = min(pred_scores).item()
     score_max = max(pred_scores).item()
     anomap_min = preds.min().item()
@@ -405,6 +424,7 @@ def main(args):
         img_transform,
         mask_transform,
         args.out_path,
+        feat_size=feat_size,
         save_images=args.save_images,
         kernel=args.mean_kernel_size,
     )

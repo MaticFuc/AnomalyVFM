@@ -9,14 +9,68 @@
 
 <sup>#</sup> Equal contribution
 
-[![arXiv paper](https://img.shields.io/badge/arXiv-paper-b31b1b.svg?style=for-the-badge)](https://arxiv.org/abs/2601.20524) [![Project Page](https://img.shields.io/badge/Project_Page-Link-blue.svg?style=for-the-badge)](https://maticfuc.github.io/anomaly_vfm/)
+[![arXiv paper](https://img.shields.io/badge/arXiv-paper-b31b1b.svg?style=for-the-badge)](https://arxiv.org/abs/2601.20524) [![Project Page](https://img.shields.io/badge/Project_Page-Link-blue.svg?style=for-the-badge)](https://maticfuc.github.io/anomaly_vfm/) [![HF Colleciton](https://img.shields.io/badge/HF-collections-yellow.svg?logo=huggingface&style=for-the-badge)](https://huggingface.co/collections/MaticFuc/anomalyvfm)
 
 
 [**Overview**](#overview) | [**Get Started**](#%EF%B8%8Flets-get-started) | [**Results**](#%EF%B8%8Fresults) | [**Citation**](#reference)
 
 </div>
 
+## ⚡ Quick Start (via TorchHub)
+
+Models can now be quickly used without using this repository using the following code. This can be set up also in other repositories. It has not been widely tested, so we welcome any bug reports / simplifications to the code.
+
+```python
+import torch
+from PIL import Image
+import torchvision
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+anomalyvfm = torch.hub.load("MaticFuc/AnomalyVFM", "anomalyvfm_radio", trust_remote_code=True, force_reload=True).to(device) # Possible options: "anomalyvfm_radio", "anomalyvfm_dinov2", "anomalyvfm_clip" and "anomalyvfm_siglip2", more to be added
+img_trf = anomalyvfm.model.get_img_transform()
+
+image = Image.open("test.png").convert("RGB")
+image = image_trf(image).unsqueeze(0).to(device)
+with torch.no_grad():
+    score, mask = anomalyvfm(image)
+
+print(f"Anomaly Score: {score.item():.4f}")
+torchvision.utils.save_image(mask.float(), "pred.png")
+```
+
+## 🤗 Quick Start (via Hugging Face)
+
+If you prefer using the Hugging Face ecosystem, you can easily load the models using the `from_pretrained` method. This requires to have the repository locally installed.
+
+>[!TIP]
+>Prerequisites: Make sure you have huggingface_hub and transformers installed. You will also need the hf_model.py and test.py files from this repository in your working directory.
+
+```python
+import torch
+from PIL import Image
+from hf_model import AnomalyVFM
+from test import save_predictions_with_paths
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Available models: anomalyvfm_radio, anomalyvfm_dinov2, anomalyvfm_clip, anomalyvfm_siglip2
+anomalyvfm = AnomalyVFM.from_pretrained("MaticFuc/anomalyvfm_radio").to(device)
+anomalyvfm.eval()
+
+image_trf = anomalyvfm.model.get_img_transform()
+image = Image.open("test.png").convert("RGB")
+input_tensor = image_trf(image).unsqueeze(0).to(device)
+
+with torch.no_grad():
+    score, mask = anomalyvfm(input_tensor)
+
+print(f"Anomaly Score: {score.item():.4f}")
+save_predictions_with_paths(mask.float(), ["./pred.png"], ".", suffix="")
+```
+
 ## 🛎️Updates
+* **` Apr. 20th, 2026`**: Pretrained models have been uploaded to HuggingFace. The ones on the Google Drive have also been slightly changed.
 * **` Apr. 9th, 2026`**: The models and training code for AnomalyVFM have been organized and uploaded.
 * **` Feb. 20th, 2026`**: AnomalyVFM has been accepted to CVPR 2026 🔥🔥🔥
 
@@ -24,7 +78,7 @@
 
 - [x] Release the base code, pretrained weights and dataset
 - [x] Upload dataset to HuggingFace
-- [ ] Upload weights to HuggingFace
+- [x] Upload weights to HuggingFace
 - [ ] Release the 3D Zero-shot Extension - Code & Paper (Goal: ~July 2026)
 - [ ] Release the Full-shot Extension - Code & Paper (Goal: ~November 2026)
 

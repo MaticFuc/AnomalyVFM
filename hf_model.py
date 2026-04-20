@@ -62,7 +62,7 @@ class AnomalyVFM(nn.Module,
                 anomaly_mask, _ = self.decoder(ftrs)
                 anomaly_mask = anomaly_mask.sigmoid()
 
-        return anomaly_score, anomaly_mask
+        return anomaly_score.float(), anomaly_mask.float()
 
     def state_dict(self, *args, **kwargs):
         state_dict = super().state_dict(*args, **kwargs)
@@ -72,5 +72,3 @@ class AnomalyVFM(nn.Module,
             clean_dict[k] = v.clone().contiguous()
             
         return clean_dict
-
-
