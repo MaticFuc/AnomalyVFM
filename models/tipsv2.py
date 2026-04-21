@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torchvision.transforms as T
+import torchvision.transforms.v2 as T
 from transformers import AutoModel
 
 from peft_local.peft_func import add_peft
